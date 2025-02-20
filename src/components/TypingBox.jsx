@@ -16,7 +16,7 @@ export const TypingBox = () => {
         <h2 className="text-white font-bold text-xl">
           Let's do some math!
         </h2>
-        <p className="text-white/65">
+        <p className="text-white/65" visible="false">
           Click when you are ready.
         </p>
       </div>
@@ -32,7 +32,7 @@ export const TypingBox = () => {
         <div className="gap-3 flex">
           <input
             className="focus:outline focus:outline-white/80 flex-grow bg-slate-800/60 p-2 px-4 rounded-full text-white placeholder:text-white/50 shadow-inner shadow-slate-900/60"
-            placeholder=""
+            placeholder="Suprise me"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => {

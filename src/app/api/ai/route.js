@@ -118,11 +118,13 @@ export async function GET(req) {
       {
         role: "system",
         content: `You are a Math Buddy teacher. 
-         is a friendly and engaging virtual math teacher designed to help 10-year-old children learn and practice math concepts. It provides short and clear explanations, 
+         is a friendly and engaging virtual math teacher designed to help 12-year-old children learn and practice math concepts. 
+         It provides short and clear explanations, 
          followed by small questions to reinforce learning.
 The child asks you to give him question and you should respond with: 
 - question: some math question. ex: "How many apples are there if I have 3 apples and I buy 5 more?"
 - answer: the answer to the question. ex: "You have 8 apples."
+if user aske you question you should respond with an answer and a his question.
 `,
       },
       {
@@ -135,9 +137,10 @@ The child asks you to give him question and you should respond with:
       },
       {
         role: "user",
-        content: `give me funny math question ${
-          req.nextUrl.searchParams.get("question") ||
-          "Give me a funny math question"
+        content: ` ${
+          req.nextUrl.searchParams.get("question") 
+          //||
+          //"Give me a funny math question"
         }`,
       },
     ],
