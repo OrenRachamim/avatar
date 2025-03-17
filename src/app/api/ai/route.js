@@ -82,12 +82,14 @@ export async function GET(req) {
       console.log(`${message.role} > ${message.content[0].text.value}`);
       if (message.role === "assistant") {
         console.log(
-          "🚀 ~ GET ~ message.content[0].text.value:",
-          '{"answer" : "' + message.content[0].text.value + '"}',
+          "🚀 ~ GET ~ assistant:",message.content[0].text.value
         );
-        return Response.json(
-          JSON.parse(JSON.stringify('{"answer" : "' + message.content[0].text.value + '"}')),
-        );
+        return new Response(message.content[0].text.value, {
+          status: 200,
+          headers: {
+            "Content-Type": "text/plain",
+          },
+        });
       }
     }
   } else {

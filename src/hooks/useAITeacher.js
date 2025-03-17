@@ -60,10 +60,12 @@ export const useAITeacher = create((set, get) => ({
 
     // Ask AI
     const res = await fetch(`/api/ai?question=${question}&speech=${speech}`);
-    const data = await res.json();
+    const data = await res.text();
     console.log("🚀 ~ askAI: ~ data:", data);
-    message.answer = data.answer;
+    message.answer = data;
     //message.question = data.question;
+    console.log("🚀 ~ askAI: ~ data.answer:", data.answer);
+
     message.speech = speech;
 
     set(() => ({
