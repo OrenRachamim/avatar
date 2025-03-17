@@ -46,6 +46,7 @@ export const useAITeacher = create((set, get) => ({
     if (!question) {
       //return;
       question = "Give me math problem";
+      question = "ספר לי מי אתה";
     }
     const message = {
       question,
@@ -56,14 +57,13 @@ export const useAITeacher = create((set, get) => ({
     }));
 
     const speech = get().speech;
-   
-    
+
     // Ask AI
     const res = await fetch(`/api/ai?question=${question}&speech=${speech}`);
     const data = await res.json();
-    console.log("🚀 ~ askAI: ~ data:", data)
+    console.log("🚀 ~ askAI: ~ data:", data);
     message.answer = data.answer;
-    message.question = data.question;
+    //message.question = data.question;
     message.speech = speech;
 
     set(() => ({
@@ -80,18 +80,17 @@ export const useAITeacher = create((set, get) => ({
     set(() => ({
       currentMessage: message,
     }));
-   
+
     if (!message.audioPlayer) {
       set(() => ({
         loading: true,
       }));
-      const text = Array.isArray(message.question)
-      ? message.question.map((word) => word.word).join(" ")
-      : message.question;
+      const text = Array.isArray(message.answer)
+        ? message.answer.map((word) => word.word).join(" ")
+        : message.answer;
       // Get TTS
       const audioRes = await fetch(
-        
-        `/api/tts?teacher=${get().teacher}&text=${text}`
+        `/api/tts?teacher=${get().teacher}&text=${text}`,
       );
 
       const audio = await audioRes.blob();

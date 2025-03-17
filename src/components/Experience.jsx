@@ -44,10 +44,11 @@ const itemPlacement = {
 export const Experience = () => {
   const teacher = useAITeacher((state) => state.teacher);
   const classroom = useAITeacher((state) => state.classroom);
+  const showClassroom = false; // Add this line to define showClassroom
 
   return (
     <>
-      <div className="z-10 md:justify-center fixed bottom-4 left-4 right-4 flex gap-3 flex-wrap justify-stretch">
+      <div className="z-10 fixed bottom-4 left-4 right-4 flex gap-3 flex-wrap justify-stretch">
         <TypingBox />
       </div>
       <Leva hidden />
@@ -61,21 +62,25 @@ export const Experience = () => {
 
         <Suspense>
           <Float speed={0.5} floatIntensity={0.2} rotationIntensity={0.1}>
-            <Html
-              transform
-              {...itemPlacement[classroom].board}
-              distanceFactor={1}
-            >
-              <MessagesList />
-              <BoardSettings />
-            </Html>
+            {true && (
+              <Html
+                transform
+                {...itemPlacement[classroom].board}
+                distanceFactor={1}
+              >
+                <MessagesList />
+                <BoardSettings />
+              </Html>
+            )}
             <Environment preset="sunset" />
             <ambientLight intensity={0.8} color="pink" />
 
-            <Gltf
-              src={`/models/classroom_${classroom}.glb`}
-              {...itemPlacement[classroom].classroom}
-            />
+            {showClassroom && (
+              <Gltf
+                src={`/models/classroom_${classroom}.glb`}
+                {...itemPlacement[classroom].classroom}
+              />
+            )}
             <Teacher
               teacher={teacher}
               key={teacher}
@@ -146,5 +151,5 @@ const CameraManager = () => {
   );
 };
 
-useGLTF.preload("/models/classroom_default.glb");
-useGLTF.preload("/models/classroom_alternative.glb");
+//useGLTF.preload("/models/classroom_default.glb");
+//useGLTF.preload("/models/classroom_alternative.glb");

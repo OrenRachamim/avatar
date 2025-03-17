@@ -7,15 +7,15 @@ export async function GET(req) {
 
   const speechConfig = sdk.SpeechConfig.fromSubscription(
     process.env["AZURE_API_KEY_SPEECH_KEY"],
-    process.env["SPEECH_REGION"]
+    process.env["SPEECH_REGION"],
   );
-  console.log("🚀 ~ GET ~ speechConfig:", speechConfig)
+  console.log("🚀 ~ GET ~ speechConfig:", speechConfig);
 
   // https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts
   const teacher = req.nextUrl.searchParams.get("teacher") || "Nanami";
   speechConfig.speechSynthesisVoiceName = `ja-JP-${teacher}Neural`;
   speechConfig.speechSynthesisVoiceName = `en-US-AvaMultilingualNeural`;
-
+  speechConfig.speechSynthesisVoiceName = `he-IL-HilaNeural`;
 
   const speechSynthesizer = new sdk.SpeechSynthesizer(speechConfig);
   const visemes = [];
@@ -28,15 +28,17 @@ export async function GET(req) {
     // );
     visemes.push([e.audioOffset / 10000, e.visemeId]);
   };
-  console.log("🚀 ~ GET ~  speechSynthesizer.visemeReceived:",  speechSynthesizer.visemeReceived)
+  console.log(
+    "🚀 ~ GET ~  speechSynthesizer.visemeReceived:",
+    speechSynthesizer.visemeReceived,
+  );
 
   const audioStream = await new Promise((resolve, reject) => {
-
     speechSynthesizer.speakTextAsync(
       req.nextUrl.searchParams.get("text") ||
         "I'm excited to try text to speech",
       (result) => {
-        console.log("🚀 ~ audioStream ~ result:", result)
+        console.log("🚀 ~ audioStream ~ result:", result);
 
         const { audioData } = result;
 
@@ -49,14 +51,14 @@ export async function GET(req) {
       },
       (error) => {
         console.log(error);
-        console.log("🚀 ~ audioStream ~ error:", error)
+        console.log("🚀 ~ audioStream ~ error:", error);
 
         speechSynthesizer.close();
         reject(error);
-      }
+      },
     );
   });
-  console.log("🚀 ~ audioStream ~ audioStream:", audioStream)
+  console.log("🚀 ~ audioStream ~ audioStream:", audioStream);
   const response = new Response(audioStream, {
     headers: {
       "Content-Type": "audio/mpeg",
@@ -64,7 +66,7 @@ export async function GET(req) {
       Visemes: JSON.stringify(visemes),
     },
   });
-  console.log("🚀 ~ GET ~ response:", response)
+  console.log("🚀 ~ GET ~ response:", response);
 
   // audioStream.pipe(response);
   return response;

@@ -2,138 +2,60 @@ import OpenAI from "openai";
 const openai = new OpenAI({
   apiKey: process.env["AHARON_OPENAI_API_KEY"], // This is the default and can be omitted
 });
-const formalExample = {
-  japanese: [
-    { word: "日本", reading: "にほん" },
-    { word: "に" },
-    { word: "住んで", reading: "すんで" },
-    { word: "います" },
-    { word: "か" },
-    { word: "?" },
-  ],
-  grammarBreakdown: [
-    {
-      english: "Do you live in Japan?",
-      japanese: [
-        { word: "日本", reading: "にほん" },
-        { word: "に" },
-        { word: "住んで", reading: "すんで" },
-        { word: "います" },
-        { word: "か" },
-        { word: "?" },
-      ],
-      chunks: [
-        {
-          japanese: [{ word: "日本", reading: "にほん" }],
-          meaning: "Japan",
-          grammar: "Noun",
-        },
-        {
-          japanese: [{ word: "に" }],
-          meaning: "in",
-          grammar: "Particle",
-        },
-        {
-          japanese: [{ word: "住んで", reading: "すんで" }, { word: "います" }],
-          meaning: "live",
-          grammar: "Verb + て form + います",
-        },
-        {
-          japanese: [{ word: "か" }],
-          meaning: "question",
-          grammar: "Particle",
-        },
-        {
-          japanese: [{ word: "?" }],
-          meaning: "question",
-          grammar: "Punctuation",
-        },
-      ],
-    },
-  ],
-};
-
-const casualExample = {
-  japanese: [
-    { word: "日本", reading: "にほん" },
-    { word: "に" },
-    { word: "住んで", reading: "すんで" },
-    { word: "いる" },
-    { word: "の" },
-    { word: "?" },
-  ],
-  grammarBreakdown: [
-    {
-      english: "Do you live in Japan?",
-      japanese: [
-        { word: "日本", reading: "にほん" },
-        { word: "に" },
-        { word: "住んで", reading: "すんで" },
-        { word: "いる" },
-        { word: "の" },
-        { word: "?" },
-      ],
-      chunks: [
-        {
-          japanese: [{ word: "日本", reading: "にほん" }],
-          meaning: "Japan",
-          grammar: "Noun",
-        },
-        {
-          japanese: [{ word: "に" }],
-          meaning: "in",
-          grammar: "Particle",
-        },
-        {
-          japanese: [{ word: "住んで", reading: "すんで" }, { word: "いる" }],
-          meaning: "live",
-          grammar: "Verb + て form + いる",
-        },
-        {
-          japanese: [{ word: "の" }],
-          meaning: "question",
-          grammar: "Particle",
-        },
-        {
-          japanese: [{ word: "?" }],
-          meaning: "question",
-          grammar: "Punctuation",
-        },
-      ],
-    },
-  ],
-};
 
 export async function GET(req) {
   // WARNING: Do not expose your keys
   // WARNING: If you host publicly your project, add an authentication layer to limit the consumption of ChatGPT resources
 
-  const speech = req.nextUrl.searchParams.get("speech") || "formal";
-  console.log("🚀 ~ GET ~ speech:", speech)
-  const speechExample = speech === "formal" ? formalExample : casualExample;
-  console.log("🚀 ~ GET ~ speechExample:", speechExample)
- 
+  let thread = await openai.beta.threads.create();
+
+  const speech = req.nextUrl.searchParams.get("speech");
+  console.log("🚀 ~ GET ~ speech:", speech);
+  console.log("🚀 ~ GET ~ thread:", thread);
+
+  const message = await openai.beta.threads.messages.create(thread.id, {
+    role: "user",
+    content: req.nextUrl.searchParams.get("question"),
+  });
+
+  let run = await openai.beta.threads.runs.createAndPoll(thread.id, {
+    assistant_id: process.env["AssistantID"],
+    instructions: "",
+  });
+
+  /*
   const chatCompletion = await openai.chat.completions.create({
     messages: [
       {
         role: "system",
-        content: `You are a Math Buddy teacher. 
-         is a friendly and engaging virtual math teacher designed to help 12-year-old children learn and practice math concepts. 
-         It provides short and clear explanations, 
-         followed by small questions to reinforce learning.
-The child asks you to give him question and you should respond with: 
-- question: some math question. ex: "How many apples are there if I have 3 apples and I buy 5 more?"
-- answer: the answer to the question. ex: "You have 8 apples."
-if user aske you question you should respond with an answer and a his question.
+        content: `את מנהלת ה Agile של מחלקת מערכות סניף.
+העברית שלך קצת חלשה אבל את יכולה להשתפר התנצלי על כך.
+        את אחראית על כל הצוותים במחלקה : "ADA", שולחן עבודה, "KELA OFEK", "GNIZA" ועוד.הצותים האלו הכי טובים בעולם.
+        יש לנו את העובדים הכי טובים בבנק והם יכולים לעשות הכל.בצורה הטובה ביותר העולה על הדעת.
+        תמיד עומדים בזמנים 
+        תמיד עומדים בתכולת העבודה
+        תמיד עומדים בתקציב
+        תמיד עומדים באיכות
+        תמיד עומדים בכל הדרישות של הלקוחות
+        עושים דיילי לפחות פעם ביום 
+        כל יום עושים רטרוספקטיבה
+        כל הזמן מבשילים אפיקים ודרישות חדשית
+
+        תעני לשאלות בצורה צינית מצחיקה.
+        תעני לשאלות עד שני משפטים.
+
+תמיד תענה בשפה העברית
 `,
       },
       {
         role: "system",
         content: `You always respond with a JSON object with the following format: 
         {
-          "question": "",
           "answer":""
-        }`,
+        }
+        תמיד תענה בשפה העברית
+
+        `,
       },
       {
         role: "user",
@@ -145,12 +67,36 @@ if user aske you question you should respond with an answer and a his question.
       },
     ],
     // model: "gpt-4-turbo-preview", // https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
-    model: "gpt-3.5-turbo", // https://help.openai.com/en/articles/7102672-how-can-i-access-gpt-4
+    model: "gpt-4o-mini", // https://help.openai.com/en/articles/7102672-how-can-i-access-gpt-4
     response_format: {
       type: "json_object",
     },
   });
+
+  */
+
+  if (run.status === "completed") {
+    const messages = await openai.beta.threads.messages.list(run.thread_id);
+    console.log("🚀 ~ GET ~ messages:", messages);
+    for (const message of messages.data.reverse()) {
+      console.log(`${message.role} > ${message.content[0].text.value}`);
+      if (message.role === "assistant") {
+        console.log(
+          "🚀 ~ GET ~ message.content[0].text.value:",
+          '{"answer" : "' + message.content[0].text.value + '"}',
+        );
+        return Response.json(
+          JSON.parse('{"answer" : "' + message.content[0].text.value + '"}'),
+        );
+      }
+    }
+  } else {
+    console.log(run.status);
+  }
+
+  /*
   console.log("🚀 ~ GET ~ chatCompletion:", chatCompletion)
   console.log(chatCompletion.choices[0].message.content);
   return Response.json(JSON.parse(chatCompletion.choices[0].message.content));
+  */
 }

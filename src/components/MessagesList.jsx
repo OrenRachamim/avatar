@@ -30,7 +30,7 @@ export const MessagesList = () => {
 
   const renderJapanese = (japanese) => (
     <p className="text-white font-bold text-4xl mt-2 font-jp flex flex-wrap gap-1">
-     { japanese}
+      {japanese}
     </p>
   );
 
@@ -67,19 +67,17 @@ export const MessagesList = () => {
                       : "bg-teal-600"
                   }`}
                 >
-                 Q:
+                  Q:
                 </span>
                 {renderEnglish(message.question)}
               </div>
               <span
-                  className={`text-white/90 text-2xl font-bold uppercase px-3 py-1 rounded-full  ${
-                    message.speech === "formal"
-                      ? "bg-indigo-600"
-                      : "bg-teal-600"
-                  }`}
-                >
-                 A:
-                </span>
+                className={`text-white/90 text-2xl font-bold uppercase px-3 py-1 rounded-full  ${
+                  message.speech === "formal" ? "bg-indigo-600" : "bg-teal-600"
+                }`}
+              >
+                A:
+              </span>
               {renderJapanese(message.answer)}
             </div>
             {currentMessage === message ? (
