@@ -86,7 +86,7 @@ export async function GET(req) {
           '{"answer" : "' + message.content[0].text.value + '"}',
         );
         return Response.json(
-          JSON.parse('{"answer" : "' + message.content[0].text.value + '"}'),
+          JSON.parse(JSON.stringify('{"answer" : "' + message.content[0].text.value + '"}')),
         );
       }
     }
